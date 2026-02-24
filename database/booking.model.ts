@@ -56,6 +56,12 @@ bookingSchema.pre("save", async function () {
 
 bookingSchema.index({ eventId: 1 });
 
+//Create compound index for common queries
+bookingSchema.index({ eventId: 1 , createdAt: -1 });
+
+//Create index on email for user booking lookups
+bookingSchema.index({email: 1});
+
 export const Booking: Model<BookingRecord> =
   mongoose.models.Booking ??
   mongoose.model<BookingRecord>("Booking", bookingSchema);
