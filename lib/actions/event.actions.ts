@@ -17,7 +17,8 @@ export const getSimilarEventsBySlug = async (slug: string) => {
             tags: { $in: event.tags},
         }).limit(6).lean();
 
-    } catch {
+    } catch (error) {
+        console.error("getSimilarEventsBySlug failed:", error);
         return [];
     }
 }
