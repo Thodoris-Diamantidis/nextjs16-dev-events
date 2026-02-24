@@ -48,7 +48,7 @@ function normalizeDateToIso(dateInput: string): string {
   if (Number.isNaN(date.getTime())) {
     throw new Error(`Invalid date: ${dateInput}`);
   }
-  return date.toISOString();
+  return date.toISOString().split("T")[0];
 }
 
 function parseTimeTo24h(timeInput: string): string {
@@ -242,7 +242,7 @@ const eventSchema = new Schema<EventRecord>(
 
 eventSchema.pre("save", function () {
   // Generate/refresh slug only when the title changes.
-  if (this.isModified("title") || !isNonEmptyString(this.slug)) {
+  if (this.isModified("title") || this.isNew) {
     this.slug = slugifyTitle(this.title);
   }
 
@@ -258,6 +258,9 @@ eventSchema.pre("save", function () {
 
 // Explicit unique index for clarity and to ensure it exists in the collection.
 eventSchema.index({ slug: 1 }, { unique: true });
+
+//Create compound index for common queries
+eventSchema.index({date: 1, mode: 1});
 
 export const Event: Model<EventRecord> =
   mongoose.models.Event ?? mongoose.model<EventRecord>("Event", eventSchema);
